@@ -27,6 +27,7 @@ import org.koom.geocoder.SPGeocoder;
 public class ReverseGeocoderTest {
 
 	String fichier = "src/test/resources/adresses.xls";
+	String fichierEthiquable = "src/test/resources/ethiquable.xls";
 	static Sheet wrksheet;
 	static Workbook wrkbook = null;
 	static Hashtable<String, Integer> dict = new Hashtable<String, Integer>();
@@ -53,6 +54,72 @@ public class ReverseGeocoderTest {
 		Assert.assertTrue(coordonnees2.get(SPGeocoder.LNG).equals(new Double(2.3509291)));
 	}
 
+	@Test
+	public void jxlethiquable() throws BiffException, IOException {
+
+		WorkbookSettings ws = new WorkbookSettings();
+		ws.setEncoding("ISO-8859-1");
+		ws.setLocale(Locale.FRANCE);
+
+		// Initialize
+		wrkbook = Workbook.getWorkbook(new File(fichierEthiquable), ws);
+		// For Demo purpose the excel sheet path is hardcoded, but not
+		// recommended :)
+		wrksheet = wrkbook.getSheet(0);
+
+		for (int ligne = 1; ligne < RowCount(); ligne++) {
+			String province = ReadCell(0, ligne);
+			String adresse = ReadCell(1, ligne);
+			String zipcode = ReadCell(2, ligne);
+			String ville = ReadCell(3, ligne);
+			String pays = ReadCell(4, ligne);
+			String telephone = ReadCell(5, ligne);
+			// lat : 6
+			// lng : 7
+
+			// System.out.println("Ligne : " + ligne + " | adresse : " + adresse
+			// + " zipcode : " + zipcode + " ville : " + ville);
+
+			String adresseComplete = adresse + "," + zipcode.trim() + "," + ville + "," + pays;
+//			System.out.println("adresseComplete : " + adresseComplete);
+
+			Map<String, Double> coordonnees = SPGeocoder.geocoder(adresseComplete);
+
+//			System.out.println(SPGeocoder.fromLatLng(coordonnees));
+
+			String adresseFormattee = "";
+			adresseFormattee += province;
+			adresseFormattee += "\t";
+			adresseFormattee += adresse;
+			adresseFormattee += "\t";
+			adresseFormattee += zipcode;
+			adresseFormattee += "\t";
+			adresseFormattee += ville;
+			adresseFormattee += "\t";
+			adresseFormattee += pays;
+			adresseFormattee += "\t";
+			adresseFormattee += telephone;
+			adresseFormattee += "\t";
+			adresseFormattee += coordonnees.get(SPGeocoder.LAT);
+			adresseFormattee += "\t";
+			adresseFormattee += coordonnees.get(SPGeocoder.LNG);
+			
+			System.out.println(adresseFormattee);
+			
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			Assert.assertTrue(SPGeocoder.test(coordonnees));
+		}
+
+		// fermeture du workbook
+		wrkbook.close();
+	}
+	
+	
 	@Test
 	public void jxl() throws BiffException, IOException {
 
@@ -104,6 +171,12 @@ public class ReverseGeocoderTest {
 			adresseFormattee += coordonnees.get(SPGeocoder.LNG);
 			
 			System.out.println(adresseFormattee);
+
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			
 			Assert.assertTrue(SPGeocoder.test(coordonnees));
 		}

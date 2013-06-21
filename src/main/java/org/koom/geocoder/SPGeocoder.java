@@ -75,8 +75,8 @@ public class SPGeocoder {
 
 			String reponseComplete = "";
 			
-			// Pour garantir le retour des appels au reseau
-			Thread.sleep(SLEEP_TIME);
+//			// Pour garantir le retour des appels au reseau
+//			Thread.sleep(SLEEP_TIME);
 
 			String output;
 			while ((output = br.readLine()) != null) {
@@ -121,9 +121,9 @@ public class SPGeocoder {
 		} catch (ParseException e3) {
 			System.err.println("Parsing de l'URL non conforme : " + url);
 			e3.printStackTrace();
-		} catch (InterruptedException e4) {
-			System.err.println("Reseau encombre");
-			e4.printStackTrace();
+//		} catch (InterruptedException e4) {
+//			System.err.println("Reseau encombre");
+//			e4.printStackTrace();
 		}
 
 		return coordonnees;
@@ -157,8 +157,8 @@ public class SPGeocoder {
 
 			StringBuffer reponseComplete = new StringBuffer();
 
-			// Pour garantir le retour des appels au reseau
-			Thread.sleep(SLEEP_TIME);
+//			// Pour garantir le retour des appels au reseau
+//			Thread.sleep(SLEEP_TIME);
 			
 			String output;
 			while ((output = br.readLine()) != null) {
@@ -199,9 +199,9 @@ public class SPGeocoder {
 			e1.printStackTrace();
 		} catch (ParseException e) {
 			e.printStackTrace();
-		} catch (InterruptedException e4) {
-			System.err.println("Reseau encombre");
-			e4.printStackTrace();
+//		} catch (InterruptedException e4) {
+//			System.err.println("Reseau encombre");
+//			e4.printStackTrace();
 		}
 
 		return coordonnees;

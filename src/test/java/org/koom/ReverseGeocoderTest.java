@@ -4,13 +4,8 @@ package org.koom;
  * 
  */
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Locale;
@@ -21,10 +16,6 @@ import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.read.biff.BiffException;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.koom.geocoder.SPGeocoder;
@@ -43,13 +34,13 @@ public class ReverseGeocoderTest {
 	@Test
 	public void testerLaClasse() {
 		// Juste verifier que l'adresse est arrivee a Google Maps Geocoder
-		Map<String, Double> coordonnees = SPGeocoder.geocoder("178 rue Lamarck, 75018, Paris, France");
+		Map<String, Double> coordonnees = SPGeocoder.geocoder("84 Quai de Jemmapes, 75010, Paris, France");
 		Assert.assertTrue(SPGeocoder.test(coordonnees));
 
 		// Avec le detail des champs de l'adresse
 		Map<String, String> champsAdresse = new HashMap<String, String>();
-		champsAdresse.put(SPGeocoder.ADRESSE, "178 rue Lamarck");
-		champsAdresse.put(SPGeocoder.ZIPCODE, "75018");
+		champsAdresse.put(SPGeocoder.ADRESSE, "84 Quai de Jemmapes");
+		champsAdresse.put(SPGeocoder.ZIPCODE, "75010");
 		champsAdresse.put(SPGeocoder.VILLE, "Paris");
 		champsAdresse.put(SPGeocoder.PAYS, "France");
 		Assert.assertTrue(SPGeocoder.test(SPGeocoder.geocoder(champsAdresse)));
@@ -57,8 +48,9 @@ public class ReverseGeocoderTest {
 		// Encore un cas de test
 		Map<String, Double> coordonnees2 = SPGeocoder.geocoder("5 Place de l'Hotel de ville, 75004 Paris, France");
 		Assert.assertTrue(SPGeocoder.test(coordonnees2));
-		Assert.assertTrue(coordonnees2.get(SPGeocoder.LAT).equals(new Double(48.8566806)));
-		Assert.assertTrue(coordonnees2.get(SPGeocoder.LNG).equals(new Double(2.3508659)));
+//		System.out.println(SPGeocoder.fromLatLng(coordonnees2));
+		Assert.assertTrue(coordonnees2.get(SPGeocoder.LAT).equals(new Double(48.85663719999999)));
+		Assert.assertTrue(coordonnees2.get(SPGeocoder.LNG).equals(new Double(2.3509291)));
 	}
 
 	@Test
@@ -90,10 +82,10 @@ public class ReverseGeocoderTest {
 			String adresseComplete = adresse + "," + zipcode.trim() + "," + ville + "," + pays;
 //			System.out.println("adresseComplete : " + adresseComplete);
 
-			Map<String, Double> coordonnees = geocoder(adresseComplete);
+			Map<String, Double> coordonnees = SPGeocoder.geocoder(adresseComplete);
 
-//			System.out.println("lat : " + coordonnees.get(SPGeocoder.LAT) + " lng : " + coordonnees.get(SPGeocoder.LNG));
-			
+//			System.out.println(SPGeocoder.fromLatLng(coordonnees));
+
 			String adresseFormattee = "";
 			adresseFormattee += province;
 			adresseFormattee += "\t";
@@ -153,84 +145,84 @@ public class ReverseGeocoderTest {
 	@Test
 	public void paris() {
 		String adresse = "1 rue de Rivoli, 75004, Paris, France";
-		Map<String, Double> coordonnees = geocoder(adresse);
+		Map<String, Double> coordonnees = SPGeocoder.geocoder(adresse);
 		Assert.assertTrue(SPGeocoder.test(coordonnees));
-		System.out.println(adresse + "\n" + "latitutde : " + coordonnees.get(SPGeocoder.LAT) + " ; longitude : " + coordonnees.get(SPGeocoder.LNG));
+		System.out.println(adresse + "\n" + SPGeocoder.fromLatLng(coordonnees));
 	}
 
-	private Map<String, Double> geocoder(String adresse) {
-
-		Map<String, Double> coordonnees = new HashMap<String, Double>();
-
-		URL url = null;
-		try {
-			url = new URL("http://maps.googleapis.com" + "/maps/api/geocode/json?sensor=false" + "&address=" + adresse.replaceAll(" ", "+"));
-
-//			 System.out.println(url.toString());
-			
-			HttpURLConnection conn;
-			conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("GET");
-			conn.setRequestProperty("Accept", "application/json");
-
-			if (conn.getResponseCode() != 200) {
-				throw new RuntimeException("Probleme : HTTP error code : " + conn.getResponseCode());
-			}
-
-			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
-
-			String reponseComplete = "";
-			
-			// Pour garantir le retour des appels au reseau
-			Thread.sleep(100);
-
-			String output;
-			// System.out.println("Resultat de Google Maps ReverseGeocoderTest ....");
-			while ((output = br.readLine()) != null) {
-				reponseComplete += output;
-			}
-
-			JSONParser parser = new JSONParser();
-
-			Object obj = parser.parse(reponseComplete);
-
-			JSONObject jsonObject = (JSONObject) obj;
-
-			JSONArray results = (JSONArray) jsonObject.get("results");
-
-			if (!jsonObject.get("status").equals("OK")) {
-				coordonnees.put(SPGeocoder.LAT, 0.0);
-				coordonnees.put(SPGeocoder.LNG, 0.0);
-				return coordonnees;
-			}
-
-			JSONObject mesresults = (JSONObject) parser.parse(((JSONObject) results.get(0)).toJSONString());
-			JSONObject geometry = (JSONObject) mesresults.get("geometry");
-			JSONObject location = (JSONObject) geometry.get("location");
-
-			Double lat = (Double) location.get(SPGeocoder.LAT);
-			Double lng = (Double) location.get(SPGeocoder.LNG);
-
-			coordonnees.put(SPGeocoder.LAT, lat);
-			coordonnees.put(SPGeocoder.LNG, lng);
-
-			conn.disconnect();
-		} catch (MalformedURLException e1) {
-			e1.printStackTrace();
-			System.err.println("Format de l'URL non conforme : " + url);
-		} catch (IOException e2) {
-			System.out.println("Impossible de lire le fichier : " + fichier);
-			e2.printStackTrace();
-		} catch (ParseException e3) {
-			System.err.println("Parsing de l'URL non conforme : " + url);
-			e3.printStackTrace();
-		} catch (InterruptedException e4) {
-			System.err.println("Reseau encombre");
-			e4.printStackTrace();
-		}
-
-		return coordonnees;
-	}
+//	private Map<String, Double> geocoder(String adresse) {
+//
+//		Map<String, Double> coordonnees = new HashMap<String, Double>();
+//
+//		URL url = null;
+//		try {
+//			url = new URL("http://maps.googleapis.com" + "/maps/api/geocode/json?sensor=false" + "&address=" + adresse.replaceAll(" ", "+"));
+//
+////			 System.out.println(url.toString());
+//			
+//			HttpURLConnection conn;
+//			conn = (HttpURLConnection) url.openConnection();
+//			conn.setRequestMethod("GET");
+//			conn.setRequestProperty("Accept", "application/json");
+//
+//			if (conn.getResponseCode() != 200) {
+//				throw new RuntimeException("Probleme : HTTP error code : " + conn.getResponseCode());
+//			}
+//
+//			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+//
+//			String reponseComplete = "";
+//			
+//			// Pour garantir le retour des appels au reseau
+//			Thread.sleep(100);
+//
+//			String output;
+//			// System.out.println("Resultat de Google Maps ReverseGeocoderTest ....");
+//			while ((output = br.readLine()) != null) {
+//				reponseComplete += output;
+//			}
+//
+//			JSONParser parser = new JSONParser();
+//
+//			Object obj = parser.parse(reponseComplete);
+//
+//			JSONObject jsonObject = (JSONObject) obj;
+//
+//			JSONArray results = (JSONArray) jsonObject.get("results");
+//
+//			if (!jsonObject.get("status").equals("OK")) {
+//				coordonnees.put(SPGeocoder.LAT, 0.0);
+//				coordonnees.put(SPGeocoder.LNG, 0.0);
+//				return coordonnees;
+//			}
+//
+//			JSONObject mesresults = (JSONObject) parser.parse(((JSONObject) results.get(0)).toJSONString());
+//			JSONObject geometry = (JSONObject) mesresults.get("geometry");
+//			JSONObject location = (JSONObject) geometry.get("location");
+//
+//			Double lat = (Double) location.get(SPGeocoder.LAT);
+//			Double lng = (Double) location.get(SPGeocoder.LNG);
+//
+//			coordonnees.put(SPGeocoder.LAT, lat);
+//			coordonnees.put(SPGeocoder.LNG, lng);
+//
+//			conn.disconnect();
+//		} catch (MalformedURLException e1) {
+//			e1.printStackTrace();
+//			System.err.println("Format de l'URL non conforme : " + url);
+//		} catch (IOException e2) {
+//			System.out.println("Impossible de lire le fichier : " + fichier);
+//			e2.printStackTrace();
+//		} catch (ParseException e3) {
+//			System.err.println("Parsing de l'URL non conforme : " + url);
+//			e3.printStackTrace();
+//		} catch (InterruptedException e4) {
+//			System.err.println("Reseau encombre");
+//			e4.printStackTrace();
+//		}
+//
+//		return coordonnees;
+//	}
 	
 	
 //	@Test

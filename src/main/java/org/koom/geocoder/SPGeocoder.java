@@ -19,7 +19,7 @@ import org.json.simple.parser.ParseException;
 
 /**
  * @author Serge Prodhomme
- *
+ * Special thanks to MKyong!
  */
 public class SPGeocoder {
 
@@ -190,6 +190,10 @@ public class SPGeocoder {
 	
 	public static boolean test(Map<String, Double> coordonnees) {
 		return !(coordonnees.get(LAT).equals(new Double(0.0)) && coordonnees.get(LNG).equals(new Double(0.0)));
+	}
+	
+	public static String fromLatLng(Map<String, Double> coordonnees) {
+		return SPGeocoder.LAT + "=" + coordonnees.get(SPGeocoder.LAT) + "\t" + SPGeocoder.LNG + "=" + coordonnees.get(SPGeocoder.LNG);
 	}
 	
 }

@@ -26,8 +26,6 @@ public class SPGeocoder {
 	static String URL_GOOGLE_MAPS = "http://maps.googleapis.com" + "/maps/api/geocode/json?sensor=false" + "&address=";
 //	static String URL_GOOGLE_MAPS = "https://maps.googleapis.com/maps/api/geocode/json?sensor=false&address=";
 	
-	private static final int SLEEP_TIME = 100;
-	
 	/**
 	 * Les clefs de la map d'adresse
 	 */
@@ -74,9 +72,6 @@ public class SPGeocoder {
 			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
 
 			String reponseComplete = "";
-			
-//			// Pour garantir le retour des appels au reseau
-//			Thread.sleep(SLEEP_TIME);
 
 			String output;
 			while ((output = br.readLine()) != null) {
@@ -121,9 +116,6 @@ public class SPGeocoder {
 		} catch (ParseException e3) {
 			System.err.println("Parsing de l'URL non conforme : " + url);
 			e3.printStackTrace();
-//		} catch (InterruptedException e4) {
-//			System.err.println("Reseau encombre");
-//			e4.printStackTrace();
 		}
 
 		return coordonnees;
@@ -156,9 +148,6 @@ public class SPGeocoder {
 			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
 
 			StringBuffer reponseComplete = new StringBuffer();
-
-//			// Pour garantir le retour des appels au reseau
-//			Thread.sleep(SLEEP_TIME);
 			
 			String output;
 			while ((output = br.readLine()) != null) {
@@ -199,9 +188,6 @@ public class SPGeocoder {
 			e1.printStackTrace();
 		} catch (ParseException e) {
 			e.printStackTrace();
-//		} catch (InterruptedException e4) {
-//			System.err.println("Reseau encombre");
-//			e4.printStackTrace();
 		}
 
 		return coordonnees;

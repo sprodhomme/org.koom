@@ -33,6 +33,14 @@
 			<version>2.6.12</version>
 		</dependency>
 
+		<!-- iText PDF : manipulation de PDF -->
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>5.0.6</version>
+		</dependency>
+
+
 	</dependencies>
 
 </project>

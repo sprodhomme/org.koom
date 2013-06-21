@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.koom;
+package fr.deux.point.cinq;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -21,7 +21,7 @@ import org.junit.Test;
  */
 public class GenererImagePng {
 
-	private static final String WEB_PATH = "/";
+	private static final String WEB_PATH = "war/resources/";
 
 	@Test
 	public void tester() {
@@ -44,9 +44,9 @@ public class GenererImagePng {
 		      ig2.drawString(message, (width - stringWidth) / 2, height / 2 + stringHeight / 4);
 
 		      ImageIO.write(bi, "PNG", new File(WEB_PATH + "image.PNG"));
-//		      ImageIO.write(bi, "JPEG", new File(WEB_PATH + "image.JPG"));
-//		      ImageIO.write(bi, "GIF", new File(WEB_PATH + "image.GIF"));
-//		      ImageIO.write(bi, "BMP", new File(WEB_PATH + "image.BMP"));
+		      ImageIO.write(bi, "JPEG", new File(WEB_PATH + "image.JPG"));
+		      ImageIO.write(bi, "GIF", new File(WEB_PATH + "image.GIF"));
+		      ImageIO.write(bi, "BMP", new File(WEB_PATH + "image.BMP"));
 		      
 		    } catch (IOException ie) {
 		      ie.printStackTrace();
